@@ -316,6 +316,7 @@ class AppDelegate: NSResponder, NSApplicationDelegate, NSUserNotificationCenterD
     func applicationDidFinishLaunching(_ aNotification: Notification) {
 
         installInvalidFrameDetector()
+        DeletedMessagesRetentionPreferences.apply()
         memoryPressureMonitor = MemoryPressureMonitor()
         Queue.concurrentBackgroundQueue().async {
             migrateWallpapersToEightBitChannels()

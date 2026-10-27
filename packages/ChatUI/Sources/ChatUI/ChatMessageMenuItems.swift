@@ -1601,7 +1601,25 @@ public func chatMenuItems(for message: Message, entry: ChatHistoryEntry?, textLa
                 string = stringForRelativeTimestamp(relativeTimestamp: edited.date, relativeTo: context.timestamp)
                 result = strings().chatContextEditedAt(string)
             }
-            sevenBlock.append(ContextMenuItem(result, itemImage: MenuAnimation.menu_edited.value))
+            let editedItem = ContextMenuItem(result, itemImage: MenuAnimation.menu_edited.value)
+            if let history = message.editHistoryAttribute, !history.entries.isEmpty {
+                let submenu = ContextMenu()
+                for entry in history.entries.reversed() {
+                    let date = stringForRelativeTimestamp(relativeTimestamp: entry.timestamp, relativeTo: context.timestamp)
+                    let preview = entry.text.isEmpty ? strings().chatContextEditHistoryEmpty : entry.text.prefixWithDots(60).replacingOccurrences(of: "\n", with: " ")
+                    submenu.addItem(ContextMenuItem(strings().chatContextEditHistoryEntry(date, preview), handler: {
+                        copyToClipboard(entry.text)
+                        showModalText(for: context.window, text: strings().contextAlertCopied)
+                    }, itemImage: MenuAnimation.menu_copy.value))
+                }
+                editedItem.submenu = submenu
+            }
+            sevenBlock.append(editedItem)
+        }
+
+        if !isService, let deleted = message.deletedAttribute {
+            let string = stringForRelativeTimestamp(relativeTimestamp: deleted.deletedAt, relativeTo: context.timestamp)
+            sevenBlock.append(ContextMenuItem(strings().chatContextDeletedAt(string), itemImage: MenuAnimation.menu_delete.value))
         }
         
         

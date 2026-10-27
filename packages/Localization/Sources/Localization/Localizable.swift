@@ -3461,6 +3461,16 @@ public final class L10n {
   /// Edit
   public static var chatContextEdit1: String  { return L10n.tr("Localizable", "Chat.Context.Edit1") }
   /// edited %@
+  /// deleted %@
+  public static func chatContextDeletedAt(_ p1: String) -> String {
+    return L10n.tr("Localizable", "Chat.Context.DeletedAt", p1)
+  }
+  /// Empty message
+  public static var chatContextEditHistoryEmpty: String  { return L10n.tr("Localizable", "Chat.Context.EditHistoryEmpty") }
+  /// %1$@: %2$@
+  public static func chatContextEditHistoryEntry(_ p1: String, _ p2: String) -> String {
+    return L10n.tr("Localizable", "Chat.Context.EditHistoryEntry", p1, p2)
+  }
   public static func chatContextEditedAt(_ p1: String) -> String {
     return L10n.tr("Localizable", "Chat.Context.EditedAt", p1)
   }
@@ -4132,6 +4142,8 @@ public final class L10n {
   }
   /// edited
   public static var chatMessageEdited: String  { return L10n.tr("Localizable", "Chat.Message.edited") }
+  /// deleted
+  public static var chatMessageDeleted: String  { return L10n.tr("Localizable", "Chat.Message.Deleted") }
   /// %@ imported
   public static func chatMessageImported(_ p1: String) -> String {
     return L10n.tr("Localizable", "Chat.Message.Imported", p1)
@@ -9092,6 +9104,14 @@ public final class L10n {
   public static var generalSettingsInstantViewScrollBySpace: String  { return L10n.tr("Localizable", "GeneralSettings.InstantView.ScrollBySpace") }
   /// Click on the unread badge to preview chats without marking them as read.
   public static var generalSettingsPreviewChatsInfo: String  { return L10n.tr("Localizable", "GeneralSettings.PreviewChats.Info") }
+  /// DELETED AND EDITED MESSAGES
+  public static var generalSettingsDeletedMessagesHeader: String  { return L10n.tr("Localizable", "GeneralSettings.DeletedMessagesHeader") }
+  /// Messages deleted by other people stay in the chat with a deleted mark, and earlier versions of edited messages are saved on this Mac. Incoming photos and files up to 20 MB are downloaded in advance so they stay available after deletion.
+  public static var generalSettingsDeletedMessagesInfo: String  { return L10n.tr("Localizable", "GeneralSettings.DeletedMessagesInfo") }
+  /// Keep Media of Deleted Messages
+  public static var generalSettingsKeepDeletedMedia: String  { return L10n.tr("Localizable", "GeneralSettings.KeepDeletedMedia") }
+  /// Keep Deleted Messages
+  public static var generalSettingsKeepDeletedMessages: String  { return L10n.tr("Localizable", "GeneralSettings.KeepDeletedMessages") }
   /// Preview Chats
   public static var generalSettingsPreviewChatsText: String  { return L10n.tr("Localizable", "GeneralSettings.PreviewChats.Text") }
   /// Photos will be sent in standard quality

@@ -2653,8 +2653,14 @@ public class ChatRowItem: TableRowItem {
                 diceStake?.measure(width: .greatestFiniteMagnitude)
             }
 
+            let deletedAttribute = messages.compactMap({ $0.deletedAttribute }).first
+
             if editedAttribute != nil || message.id.namespace == Namespaces.Message.Cloud {
-                if isEditMarkVisible || isUnsent, message.id.peerId != context.peerId, let editedAttribute {
+                if let deletedAttribute {
+                    let attr: NSAttributedString = .initialize(string: strings().chatMessageDeleted, color: isStateOverlayLayout ? stateOverlayTextColor : theme.colors.redUI, font: renderType == .bubble ? .normal(.small) : .normal(.short))
+                    editedLabel = TextViewLayout(attr, maximumNumberOfLines: 1)
+                    editedLabel?.measure(width: .greatestFiniteMagnitude)
+                } else if isEditMarkVisible || isUnsent, message.id.peerId != context.peerId, let editedAttribute {
                     
                     
                     var string = strings().chatMessageEdited
@@ -2688,6 +2694,9 @@ public class ChatRowItem: TableRowItem {
             } else if let forwardInfo = message.forwardInfo {
                 let formatterEdited = DateSelectorUtil.chatFullDateFormatter
                 fullDate = "\(fullDate) (\(formatterEdited.string(from: Date(timeIntervalSince1970: TimeInterval(forwardInfo.date)))))"
+            }
+            if let deletedAttribute {
+                fullDate = "\(fullDate)\n\(strings().chatContextDeletedAt(DateSelectorUtil.chatFullDateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(deletedAttribute.deletedAt)))))"
             }
             let replyPresentation = { [self] in ChatAccessoryPresentation(background: hasBubble ? theme.chat.backgroundColor(isIncoming, object.renderType == .bubble) : isBubbled ?  theme.colors.grayForeground : theme.colors.background, colors: theme.chat.replyTitle(self), enabledText: theme.chat.replyText(self), disabledText: theme.chat.replyDisabledText(self), quoteIcon: theme.chat.replyQuote(self), pattern: theme.chat.replyPattern(self), giftEmojiFileId: theme.chat.replyGiftEmojiId(self), app: theme) }
 
