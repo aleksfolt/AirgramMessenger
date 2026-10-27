@@ -40,6 +40,7 @@ func _internal_deleteEphemeralReplacements(transaction: Transaction, anchorIds: 
 }
 
 public func _internal_deleteMessages(transaction: Transaction, mediaBox: MediaBox, ids: [MessageId], deleteMedia: Bool = true, manualAddMessageThreadStatsDifference: ((MessageThreadKey, Int, Int) -> Void)? = nil) {
+    releaseDeletedMessagesMedia(transaction: transaction, mediaBox: mediaBox, ids: ids)
     var resourceIds: [MediaResourceId] = []
     if deleteMedia {
         for id in ids {

@@ -233,7 +233,7 @@ func scanFiles(at path: String, olderThan minTimestamp: Int32, includeSubdirecto
                         }
                     }
                 } else {
-                    if value.st_mtimespec.tv_sec < minTimestamp {
+                    if value.st_mtimespec.tv_sec < minTimestamp && !MediaBox.isProtectedFile(path: String(cString: pathBuffer)) {
                         unlink(pathBuffer)
                         result.unlinkedCount += 1
                         if let didUnlink = didUnlink {
@@ -524,8 +524,11 @@ private final class TimeBasedCleanupImpl {
                         if isCancelled() {
                             return false
                         }
+                        if filePaths.contains(where: { MediaBox.isProtectedFile(path: $0) }) {
+                            return true
+                        }
                         remainingSize -= size
-                        
+
                         // Every path here is a hard link to the same inode; all of them
                         // must go for the space to be released.
                         for filePath in filePaths {

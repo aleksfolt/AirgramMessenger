@@ -297,7 +297,7 @@ private func requestEditMessageInternal(accountPeerId: PeerId, postbox: Postbox,
                                                     updatedMedia = previousMessage.media
                                                 }
 
-                                                return .update(message.withUpdatedLocalTags(updatedLocalTags).withUpdatedFlags(updatedFlags).withUpdatedMedia(updatedMedia))
+                                                return .update(storeMessageWithUpdatedEditHistory(previousMessage: previousMessage, updatedMessage: message.withUpdatedLocalTags(updatedLocalTags).withUpdatedFlags(updatedFlags).withUpdatedMedia(updatedMedia)))
                                             })
                                         }
                                     case .updateNewMessage(let data):
@@ -323,7 +323,7 @@ private func requestEditMessageInternal(accountPeerId: PeerId, postbox: Postbox,
                                                     updatedMedia = previousMessage.media
                                                 }
 
-                                                return .update(message.withUpdatedLocalTags(updatedLocalTags).withUpdatedFlags(updatedFlags).withUpdatedMedia(updatedMedia))
+                                                return .update(storeMessageWithUpdatedEditHistory(previousMessage: previousMessage, updatedMessage: message.withUpdatedLocalTags(updatedLocalTags).withUpdatedFlags(updatedFlags).withUpdatedMedia(updatedMedia)))
                                             })
                                         }
                                     case .updateEditChannelMessage(let data):
@@ -349,7 +349,7 @@ private func requestEditMessageInternal(accountPeerId: PeerId, postbox: Postbox,
                                                     updatedMedia = previousMessage.media
                                                 }
 
-                                                return .update(message.withUpdatedLocalTags(updatedLocalTags).withUpdatedFlags(updatedFlags).withUpdatedMedia(updatedMedia))
+                                                return .update(storeMessageWithUpdatedEditHistory(previousMessage: previousMessage, updatedMessage: message.withUpdatedLocalTags(updatedLocalTags).withUpdatedFlags(updatedFlags).withUpdatedMedia(updatedMedia)))
                                             })
                                         }
                                     case .updateNewChannelMessage(let data):
@@ -375,7 +375,7 @@ private func requestEditMessageInternal(accountPeerId: PeerId, postbox: Postbox,
                                                     updatedMedia = previousMessage.media
                                                 }
                                                 
-                                                return .update(message.withUpdatedLocalTags(updatedLocalTags).withUpdatedFlags(updatedFlags).withUpdatedMedia(updatedMedia))
+                                                return .update(storeMessageWithUpdatedEditHistory(previousMessage: previousMessage, updatedMessage: message.withUpdatedLocalTags(updatedLocalTags).withUpdatedFlags(updatedFlags).withUpdatedMedia(updatedMedia)))
                                             })
                                         }
                                     default:

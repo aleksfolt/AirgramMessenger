@@ -4622,18 +4622,31 @@ func replayFinalState(
             case let .DeleteEphemeralMessages(peerId, ids):
                 deleteEphemeralMessages(transaction: transaction, peerId: peerId, ids: ids)
             case let .DeleteMessagesWithGlobalIds(ids):
-                var resourceIds: [MediaResourceId] = []
-                transaction.deleteMessagesWithGlobalIds(ids, forEachMedia: { media in
-                    addMessageMediaResourceIdsToRemove(media: media, resourceIds: &resourceIds)
-                })
-                if !resourceIds.isEmpty {
-                    let _ = mediaBox.removeCachedResources(Array(Set(resourceIds)), force: true).start()
+                let deletedAt = Int32(Date().timeIntervalSince1970)
+                let removedGlobalIds = ids.filter { globalId in
+                    guard let messageId = transaction.messageIdsForGlobalIds([globalId]).first else {
+                        return true
+                    }
+                    return !interceptMessageDeletion(transaction: transaction, mediaBox: mediaBox, messageId: messageId, deletedAt: deletedAt)
+                }
+                if !removedGlobalIds.isEmpty {
+                    var resourceIds: [MediaResourceId] = []
+                    transaction.deleteMessagesWithGlobalIds(removedGlobalIds, forEachMedia: { media in
+                        addMessageMediaResourceIdsToRemove(media: media, resourceIds: &resourceIds)
+                    })
+                    if !resourceIds.isEmpty {
+                        let _ = mediaBox.removeCachedResources(Array(Set(resourceIds)), force: true).start()
+                    }
                 }
                 deletedMessageIds.append(contentsOf: ids.map { .global($0) })
             case let .DeleteMessages(ids):
-                _internal_deleteMessages(transaction: transaction, mediaBox: mediaBox, ids: ids, manualAddMessageThreadStatsDifference: { id, add, remove in
-                    addMessageThreadStatsDifference(threadKey: id, remove: remove, addedMessagePeer: nil, addedMessageId: nil, isOutgoing: false)
-                })
+                let deletedAt = Int32(Date().timeIntervalSince1970)
+                let removedIds = ids.filter { !interceptMessageDeletion(transaction: transaction, mediaBox: mediaBox, messageId: $0, deletedAt: deletedAt) }
+                if !removedIds.isEmpty {
+                    _internal_deleteMessages(transaction: transaction, mediaBox: mediaBox, ids: removedIds, manualAddMessageThreadStatsDifference: { id, add, remove in
+                        addMessageThreadStatsDifference(threadKey: id, remove: remove, addedMessagePeer: nil, addedMessageId: nil, isOutgoing: false)
+                    })
+                }
                 deletedMessageIds.append(contentsOf: ids.map { .messageId($0) })
             case let .UpdateMinAvailableMessage(id):
                 if let message = transaction.getMessage(id) {

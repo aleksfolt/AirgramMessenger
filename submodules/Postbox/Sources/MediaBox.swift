@@ -135,9 +135,11 @@ private final class MediaBoxKeepResourceContext {
 }
 
 public final class MediaBox {
+    public static var isResourceProtected: ((String, MediaResourceId) -> Bool)?
+
     public let basePath: String
     public let isMainProcess: Bool
-    
+
     private let statusQueue = Queue()
     private let concurrentQueue = Queue.concurrentDefaultQueue()
     public let dataQueue = Queue(name: "MediaBox-Data")
@@ -231,6 +233,14 @@ public final class MediaBox {
         }
     }
     
+    static func isProtectedFile(path: String) -> Bool {
+        guard let isResourceProtected = MediaBox.isResourceProtected else {
+            return false
+        }
+        let nsPath = path as NSString
+        return isResourceProtected(nsPath.deletingLastPathComponent, MediaResourceId(MediaBox.idForFileName(name: nsPath.lastPathComponent)))
+    }
+
     private func fileNameForId(_ id: MediaResourceId) -> String {
         return "\(id.stringRepresentation)"
     }
@@ -1821,7 +1831,13 @@ public final class MediaBox {
                     }
                 }
                 
+                let isResourceProtected = MediaBox.isResourceProtected
                 for id in ids {
+                    if let isResourceProtected, isResourceProtected(self.basePath, id) {
+                        count += 3
+                        reportProgress(count)
+                        continue
+                    }
                     if !force {
                         if self.fileContexts[id] != nil {
                             count += 3
@@ -1937,7 +1953,11 @@ public final class MediaBox {
         return Signal { subscriber in
             self.dataQueue.async {
                 var removedIds: [MediaResourceId] = []
+                let isResourceProtected = MediaBox.isResourceProtected
                 for id in ids {
+                    if let isResourceProtected, isResourceProtected(self.basePath, id) {
+                        continue
+                    }
                     if !force {
                         if self.fileContexts[id] != nil {
                             continue

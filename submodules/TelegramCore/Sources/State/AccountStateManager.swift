@@ -1227,6 +1227,8 @@ public final class AccountStateManager {
                     let _ = self.delayNotificatonsUntil.swap(events.delayNotificatonsUntil)
                 }
                 
+                DeletedMediaPrefetch.prefetchIfNeeded(postbox: self.postbox, messageIds: events.addedIncomingMessageIds)
+                
                 let signal = self.postbox.transaction { transaction -> [([Message], PeerGroupId, Bool, MessageHistoryThreadData?)] in
                     var messageList: [([Message], PeerGroupId, Bool, MessageHistoryThreadData?)] = []
                     

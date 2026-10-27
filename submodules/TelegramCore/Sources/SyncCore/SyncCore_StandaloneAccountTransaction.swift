@@ -187,6 +187,12 @@ public let telegramPostboxSeedConfiguration: SeedConfiguration = {
             if let previousEphemeralReplacement, !updated.contains(where: { $0 is EphemeralReplacementMessageAttribute }) {
                 updated.append(previousEphemeralReplacement)
             }
+            if let previousDeleted = previous.first(where: { $0 is DeletedMessageAttribute }), !updated.contains(where: { $0 is DeletedMessageAttribute }) {
+                updated.append(previousDeleted)
+            }
+            if let previousEditHistory = previous.first(where: { $0 is MessageEditHistoryAttribute }), !updated.contains(where: { $0 is MessageEditHistoryAttribute }) {
+                updated.append(previousEditHistory)
+            }
         },
         decodeMessageThreadInfo: { entry in
             guard let data = entry.get(MessageHistoryThreadData.self) else {
