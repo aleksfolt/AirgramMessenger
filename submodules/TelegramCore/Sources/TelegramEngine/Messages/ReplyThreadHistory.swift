@@ -485,7 +485,7 @@ private class ReplyThreadHistoryContextImpl {
                 |> ignoreValues
                 if revalidate {
                 }
-                strongSelf.readDisposable.set(signal.start())
+                strongSelf.readDisposable.set(GhostMode.sends(.readMessages, peerId: peerId) ? signal.start() : nil)
             } else {
                 var signal = strongSelf.account.network.request(Api.functions.messages.readDiscussion(peer: inputPeer, msgId: Int32(clamping: threadId), readMaxId: messageIndex.id.id))
                 |> `catch` { _ -> Signal<Api.Bool, NoError> in
@@ -520,7 +520,7 @@ private class ReplyThreadHistoryContextImpl {
                     signal = signal
                     |> then(validateSignal)
                 }
-                strongSelf.readDisposable.set(signal.start())
+                strongSelf.readDisposable.set(GhostMode.sends(.readMessages, peerId: peerId) ? signal.start() : nil)
             }
         })
     }

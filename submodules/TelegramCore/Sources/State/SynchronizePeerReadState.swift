@@ -183,6 +183,11 @@ func localReadMarkIsAheadOfServer(localMaxIncomingReadId: MessageId.Id, serverMa
 }
 
 private func validatePeerReadState(network: Network, postbox: Postbox, stateManager: AccountStateManager, peerId: PeerId) -> Signal<Never, PeerReadStateValidationError> {
+    if !GhostMode.sends(.readMessages, peerId: peerId) {
+        return confirmSynchronized(postbox: postbox, peerId: peerId)
+        |> ignoreValues
+    }
+
     if peerId.namespace == Namespaces.Peer.SecretChat {
         // A secret chat has no Api.InputPeer, so there is no dialog to read an authoritative
         // read state from: every step below fails at inputPeer and asks to retry, forever.
@@ -363,6 +368,11 @@ private func pushPeerReadState(network: Network, postbox: Postbox, stateManager:
 }
 
 private func pushPeerReadState(network: Network, postbox: Postbox, stateManager: AccountStateManager, peerId: PeerId, willValidate: Bool) -> Signal<Never, PeerReadStateValidationError> {
+    if !GhostMode.sends(.readMessages, peerId: peerId) {
+        return confirmSynchronized(postbox: postbox, peerId: peerId)
+        |> ignoreValues
+    }
+
     let currentReadState = postbox.transaction { transaction -> (MessageId.Namespace, PeerReadState)? in
         if let readStates = transaction.getPeerReadStates(peerId) {
             for (namespace, readState) in readStates {
@@ -451,5 +461,31 @@ func synchronizePeerReadState(network: Network, postbox: Postbox, stateManager: 
             |> then(validatePeerReadState(network: network, postbox: postbox, stateManager: stateManager, peerId: peerId))
         }
         return signal
+    }
+}
+
+func _internal_forcePushPeerReadState(network: Network, postbox: Postbox, stateManager: AccountStateManager, peerId: PeerId) -> Signal<Never, NoError> {
+    let currentReadState = postbox.transaction { transaction -> PeerReadState? in
+        if let readStates = transaction.getPeerReadStates(peerId) {
+            for (namespace, readState) in readStates {
+                if namespace == Namespaces.Message.Cloud || namespace == Namespaces.Message.SecretIncoming {
+                    return readState
+                }
+            }
+        }
+        return nil
+    }
+
+    return currentReadState
+    |> castError(PeerReadStateValidationError.self)
+    |> mapToSignal { readState -> Signal<Never, PeerReadStateValidationError> in
+        guard let readState else {
+            return .complete()
+        }
+        return pushPeerReadState(network: network, postbox: postbox, stateManager: stateManager, peerId: peerId, readState: readState)
+        |> ignoreValues
+    }
+    |> `catch` { _ -> Signal<Never, NoError> in
+        return .complete()
     }
 }
