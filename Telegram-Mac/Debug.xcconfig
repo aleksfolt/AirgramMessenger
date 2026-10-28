@@ -5,8 +5,8 @@
 #include "common.xcconfig"
 
 DSA_PEM_FILE = dsa_pub.pem
-SFEED_URL = https:$(SIMPLE_SLASH)/mac-updates.telegram.org/beta/versions.xml
+SFEED_URL = https:$(SIMPLE_SLASH)/aleksfolt.github.io/AirgramMessenger/appcast.xml
 SOURCE = DEBUG
 
-TYPE = -D'BETA'
+TYPE = -D'BETA' -D'GITHUB'
 OTHER_SWIFT_FLAGS = $(TYPE)

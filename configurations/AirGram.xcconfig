@@ -1,0 +1,7 @@
+#include "common.xcconfig"
+DSA_PEM_FILE = dsa_pub_prod.pem
+SFEED_URL = https:$(SIMPLE_SLASH)/aleksfolt.github.io/AirgramMessenger/appcast.xml
+SOURCE = STABLE
+
+TYPE = -D'GITHUB'
+OTHER_SWIFT_FLAGS = $(TYPE)

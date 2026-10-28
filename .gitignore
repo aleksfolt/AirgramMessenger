@@ -29,3 +29,7 @@ core-xprojects/tlottie/build
 .swiftpm/
 .ci-build-logs/
 *.profraw
+
+# AirGram API credentials, see configurations/AirGram.xcconfig
+Telegram-Mac/AirGram.secrets.xcconfig
+build-airgram/

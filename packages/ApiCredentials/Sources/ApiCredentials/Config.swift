@@ -1,25 +1,45 @@
 import Cocoa
+import Security
 
 public final class ApiEnvironment {
     public static var apiId:Int32 {
+        if let value = Bundle.main.object(forInfoDictionaryKey: "AirGramApiId") as? String, let apiId = Int32(value), apiId != 0 {
+            return apiId
+        }
         return 9
     }
     public static var apiHash:String {
+        if let value = Bundle.main.object(forInfoDictionaryKey: "AirGramApiHash") as? String, !value.isEmpty {
+            return value
+        }
         return "3975f648bb682ee889f35483bc618d1c"
     }
-    
+
     public static var bundleId: String {
-        return "ru.keepcoder.Telegram"
+        return "com.aleksfolt.airgram"
     }
     public static var teamId: String {
-        return "6N38VWS5BX"
+        return "N46TN2QKZB"
     }
-    
-    
-    
+
+    private static let isSignedByTeam: Bool = {
+        var code: SecCode?
+        guard SecCodeCopySelf([], &code) == errSecSuccess, let code else {
+            return false
+        }
+        var staticCode: SecStaticCode?
+        guard SecCodeCopyStaticCode(code, [], &staticCode) == errSecSuccess, let staticCode else {
+            return false
+        }
+        var information: CFDictionary?
+        guard SecCodeCopySigningInformation(staticCode, SecCSFlags(rawValue: kSecCSSigningInformation), &information) == errSecSuccess, let information = information as? [String: Any] else {
+            return false
+        }
+        return information[kSecCodeInfoTeamIdentifier as String] as? String == teamId
+    }()
+
     public static var containerURL: URL? {
-        let appGroupName = ApiEnvironment.group
-        let containerUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)?.appendingPathComponent(prefix)
+        let containerUrl = legacyContainerURL?.appendingPathComponent(prefix)
         if let containerUrl = containerUrl {
             try? FileManager.default.createDirectory(at: containerUrl, withIntermediateDirectories: true, attributes: nil)
             return containerUrl
@@ -44,9 +64,10 @@ public final class ApiEnvironment {
     }
     
     public static var legacyContainerURL: URL? {
-        let appGroupName = ApiEnvironment.group
-        let containerUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)
-        return containerUrl
+        if isSignedByTeam {
+            return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: ApiEnvironment.group)
+        }
+        return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("AirGram")
     }
     
     public static var group: String {
