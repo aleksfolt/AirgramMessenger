@@ -2231,6 +2231,18 @@ public class ChatListRowItem: TableRowItem {
                     }
                 }
                 
+                if !isSecret, !mode.savedMessages, !isAd, context.peerId != peerId {
+                    let ghostActive = GhostMode.isActive(peerId: peerId)
+                    if ghostActive {
+                        firstGroup.append(ContextMenuItem(strings().chatListContextGhostModeReadChat, handler: {
+                            _ = context.engine.messages.forcePushPeerReadState(peerId: peerId).start()
+                        }, itemImage: MenuAnimation.menu_read.value))
+                    }
+                    firstGroup.append(ContextMenuItem(ghostActive ? strings().chatListContextGhostModeDisable : strings().chatListContextGhostModeEnable, handler: {
+                        GhostMode.setActive(!ghostActive, peerId: peerId)
+                    }, itemImage: (ghostActive ? MenuAnimation.menu_eye : MenuAnimation.menu_eye_slash).value))
+                }
+                
                 if isAd {
                     firstGroup.append(ContextMenuItem(strings().chatListContextHidePromo, handler: {
                         ChatListUIHooks.shared.chatListHidePromoItem(context, peerId)

@@ -5834,6 +5834,12 @@ public final class L10n {
   public static var chatListContextMaskAsUnread: String  { return L10n.tr("Localizable", "ChatList.Context.MaskAsUnread") }
   /// Mute
   public static var chatListContextMute: String  { return L10n.tr("Localizable", "ChatList.Context.Mute") }
+  /// Turn Off Ghost Mode for Chat
+  public static var chatListContextGhostModeDisable: String  { return L10n.tr("Localizable", "ChatList.Context.GhostMode.Disable") }
+  /// Turn On Ghost Mode for Chat
+  public static var chatListContextGhostModeEnable: String  { return L10n.tr("Localizable", "ChatList.Context.GhostMode.Enable") }
+  /// Send Read Receipt
+  public static var chatListContextGhostModeReadChat: String  { return L10n.tr("Localizable", "ChatList.Context.GhostMode.ReadChat") }
   /// Close
   public static var chatListContextPause: String  { return L10n.tr("Localizable", "ChatList.Context.Pause") }
   /// Pin
@@ -9108,6 +9114,22 @@ public final class L10n {
   public static var generalSettingsDeletedMessagesHeader: String  { return L10n.tr("Localizable", "GeneralSettings.DeletedMessagesHeader") }
   /// Messages deleted by other people stay in the chat with a deleted mark, and earlier versions of edited messages are saved on this Mac. Incoming photos and files up to 20 MB are downloaded in advance so they stay available after deletion.
   public static var generalSettingsDeletedMessagesInfo: String  { return L10n.tr("Localizable", "GeneralSettings.DeletedMessagesInfo") }
+  /// Don't Count Post Views
+  public static var generalSettingsGhostModeDontCountViews: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.DontCountViews") }
+  /// Don't Mark Media as Viewed
+  public static var generalSettingsGhostModeDontReadMedia: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.DontReadMedia") }
+  /// Don't Send Read Receipts
+  public static var generalSettingsGhostModeDontReadMessages: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.DontReadMessages") }
+  /// Ghost Mode
+  public static var generalSettingsGhostModeEnabled: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.Enabled") }
+  /// GHOST MODE
+  public static var generalSettingsGhostModeHeader: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.Header") }
+  /// Hide Online Status
+  public static var generalSettingsGhostModeHideOnline: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.HideOnline") }
+  /// Hide Typing Status
+  public static var generalSettingsGhostModeHideTyping: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.HideTyping") }
+  /// Other people will not see that you read their messages or opened their media. Messages are still marked as read on this Mac. Use "Send Read Receipt" in the chat list menu to let a person know you read their messages.
+  public static var generalSettingsGhostModeInfo: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.Info") }
   /// Keep Media of Deleted Messages
   public static var generalSettingsKeepDeletedMedia: String  { return L10n.tr("Localizable", "GeneralSettings.KeepDeletedMedia") }
   /// Keep Deleted Messages
