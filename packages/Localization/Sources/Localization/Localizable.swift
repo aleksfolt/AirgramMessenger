@@ -5834,11 +5834,73 @@ public final class L10n {
   public static var chatListContextMaskAsUnread: String  { return L10n.tr("Localizable", "ChatList.Context.MaskAsUnread") }
   /// Mute
   public static var chatListContextMute: String  { return L10n.tr("Localizable", "ChatList.Context.Mute") }
-  /// Turn Off Ghost Mode for Chat
+  /// AirGram Preferences
+  public static var airgramPreferences: String  { return L10n.tr("Localizable", "Airgram.Preferences") }
+  /// CATEGORIES
+  public static var airgramHubCategories: String  { return L10n.tr("Localizable", "Airgram.Hub.Categories") }
+  /// LINKS
+  public static var airgramHubLinks: String  { return L10n.tr("Localizable", "Airgram.Hub.Links") }
+  /// AirGram
+  public static var airgramHubCategoryAirgram: String  { return L10n.tr("Localizable", "Airgram.Hub.Category.Airgram") }
+  /// Channel
+  public static var airgramHubLinkChannel: String  { return L10n.tr("Localizable", "Airgram.Hub.Link.Channel") }
+  /// Chats
+  public static var airgramHubLinkChats: String  { return L10n.tr("Localizable", "Airgram.Hub.Link.Chats") }
+  /// Site
+  public static var airgramHubLinkSite: String  { return L10n.tr("Localizable", "Airgram.Hub.Link.Site") }
+  /// GHOST MODE & PRIVACY
+  public static var airgramFeaturesGhostPrivacy: String  { return L10n.tr("Localizable", "Airgram.Features.GhostPrivacy") }
+  /// MESSAGE RETENTION
+  public static var airgramFeaturesRetention: String  { return L10n.tr("Localizable", "Airgram.Features.Retention") }
+  /// Keep Deleted Messages
+  public static var airgramRetentionKeepDeletedMessages: String  { return L10n.tr("Localizable", "Airgram.Retention.KeepDeletedMessages") }
+  /// Retain Deleted Media Files
+  public static var airgramRetentionKeepDeletedMedia: String  { return L10n.tr("Localizable", "Airgram.Retention.KeepDeletedMedia") }
+  /// Private Chats
+  public static var airgramRetentionKeepDeletedMediaPrivateChats: String  { return L10n.tr("Localizable", "Airgram.Retention.KeepDeletedMedia.PrivateChats") }
+  /// Groups
+  public static var airgramRetentionKeepDeletedMediaGroups: String  { return L10n.tr("Localizable", "Airgram.Retention.KeepDeletedMedia.Groups") }
+  /// Channels
+  public static var airgramRetentionKeepDeletedMediaChannels: String  { return L10n.tr("Localizable", "Airgram.Retention.KeepDeletedMedia.Channels") }
+  /// Ghost Mode
+  public static var airgramGhostModeTitle: String  { return L10n.tr("Localizable", "Airgram.GhostMode.Title") }
+  /// Ghost Mode
+  public static var airgramGhostModeToggle: String  { return L10n.tr("Localizable", "Airgram.GhostMode.Toggle") }
+  /// Stops your client from telling others what you're doing: read receipts, online status, typing indicators and view counts are all held back.
+  public static var airgramGhostModeNotice: String  { return L10n.tr("Localizable", "Airgram.GhostMode.Notice") }
+  /// WHAT TO HIDE
+  public static var airgramGhostModeDetailsHeader: String  { return L10n.tr("Localizable", "Airgram.GhostMode.Details.Header") }
+  /// Don't Send Read Receipts
+  public static var airgramGhostModeDontReadMessages: String  { return L10n.tr("Localizable", "Airgram.GhostMode.DontReadMessages") }
+  /// Don't Mark Media as Played
+  public static var airgramGhostModeDontReadMedia: String  { return L10n.tr("Localizable", "Airgram.GhostMode.DontReadMedia") }
+  /// Don't Show Online Status
+  public static var airgramGhostModeDontSendOnline: String  { return L10n.tr("Localizable", "Airgram.GhostMode.DontSendOnline") }
+  /// Don't Send Typing Status
+  public static var airgramGhostModeDontSendTyping: String  { return L10n.tr("Localizable", "Airgram.GhostMode.DontSendTyping") }
+  /// Don't Count Post Views
+  public static var airgramGhostModeDontCountViews: String  { return L10n.tr("Localizable", "Airgram.GhostMode.DontCountViews") }
+  /// Chats still appear read on this device — only the server isn't told. Applies to every account on this device. Use "Read Chat" in a chat's context menu to send a read receipt on demand.
+  public static var airgramGhostModeDetailsNotice: String  { return L10n.tr("Localizable", "Airgram.GhostMode.Details.Notice") }
+  /// On
+  public static var airgramGhostModeOn: String  { return L10n.tr("Localizable", "Airgram.GhostMode.On") }
+  /// Off
+  public static var airgramGhostModeOff: String  { return L10n.tr("Localizable", "Airgram.GhostMode.Off") }
+  /// Chat Exceptions
+  public static var airgramGhostModePerChatTitle: String  { return L10n.tr("Localizable", "Airgram.GhostMode.PerChat.Title") }
+  /// These chats ignore the settings above. Change an exception from the chat's context menu in the chat list.
+  public static var airgramGhostModePerChatNotice: String  { return L10n.tr("Localizable", "Airgram.GhostMode.PerChat.Notice") }
+  /// Ghost Mode on
+  public static var airgramGhostModePerChatOn: String  { return L10n.tr("Localizable", "Airgram.GhostMode.PerChat.On") }
+  /// Ghost Mode off
+  public static var airgramGhostModePerChatOff: String  { return L10n.tr("Localizable", "Airgram.GhostMode.PerChat.Off") }
+  /// You haven't set any exceptions yet.
+  public static var airgramGhostModePerChatEmpty: String  { return L10n.tr("Localizable", "Airgram.GhostMode.PerChat.Empty") }
+  /// Don't Use Ghost Mode Here
   public static var chatListContextGhostModeDisable: String  { return L10n.tr("Localizable", "ChatList.Context.GhostMode.Disable") }
-  /// Turn On Ghost Mode for Chat
+  /// Ghost Mode for This Chat
   public static var chatListContextGhostModeEnable: String  { return L10n.tr("Localizable", "ChatList.Context.GhostMode.Enable") }
-  /// Send Read Receipt
+  /// Read Chat
   public static var chatListContextGhostModeReadChat: String  { return L10n.tr("Localizable", "ChatList.Context.GhostMode.ReadChat") }
   /// Close
   public static var chatListContextPause: String  { return L10n.tr("Localizable", "ChatList.Context.Pause") }
@@ -9110,30 +9172,6 @@ public final class L10n {
   public static var generalSettingsInstantViewScrollBySpace: String  { return L10n.tr("Localizable", "GeneralSettings.InstantView.ScrollBySpace") }
   /// Click on the unread badge to preview chats without marking them as read.
   public static var generalSettingsPreviewChatsInfo: String  { return L10n.tr("Localizable", "GeneralSettings.PreviewChats.Info") }
-  /// DELETED AND EDITED MESSAGES
-  public static var generalSettingsDeletedMessagesHeader: String  { return L10n.tr("Localizable", "GeneralSettings.DeletedMessagesHeader") }
-  /// Messages deleted by other people stay in the chat with a deleted mark, and earlier versions of edited messages are saved on this Mac. Incoming photos and files up to 20 MB are downloaded in advance so they stay available after deletion.
-  public static var generalSettingsDeletedMessagesInfo: String  { return L10n.tr("Localizable", "GeneralSettings.DeletedMessagesInfo") }
-  /// Don't Count Post Views
-  public static var generalSettingsGhostModeDontCountViews: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.DontCountViews") }
-  /// Don't Mark Media as Viewed
-  public static var generalSettingsGhostModeDontReadMedia: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.DontReadMedia") }
-  /// Don't Send Read Receipts
-  public static var generalSettingsGhostModeDontReadMessages: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.DontReadMessages") }
-  /// Ghost Mode
-  public static var generalSettingsGhostModeEnabled: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.Enabled") }
-  /// GHOST MODE
-  public static var generalSettingsGhostModeHeader: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.Header") }
-  /// Hide Online Status
-  public static var generalSettingsGhostModeHideOnline: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.HideOnline") }
-  /// Hide Typing Status
-  public static var generalSettingsGhostModeHideTyping: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.HideTyping") }
-  /// Other people will not see that you read their messages or opened their media. Messages are still marked as read on this Mac. Use "Send Read Receipt" in the chat list menu to let a person know you read their messages.
-  public static var generalSettingsGhostModeInfo: String  { return L10n.tr("Localizable", "GeneralSettings.GhostMode.Info") }
-  /// Keep Media of Deleted Messages
-  public static var generalSettingsKeepDeletedMedia: String  { return L10n.tr("Localizable", "GeneralSettings.KeepDeletedMedia") }
-  /// Keep Deleted Messages
-  public static var generalSettingsKeepDeletedMessages: String  { return L10n.tr("Localizable", "GeneralSettings.KeepDeletedMessages") }
   /// Preview Chats
   public static var generalSettingsPreviewChatsText: String  { return L10n.tr("Localizable", "GeneralSettings.PreviewChats.Text") }
   /// Photos will be sent in standard quality

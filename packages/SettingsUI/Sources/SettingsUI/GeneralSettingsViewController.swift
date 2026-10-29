@@ -18,32 +18,6 @@ import FoundationUtils
 import TelegramMediaUtils
 
 
-private enum GhostModeRowKind: Int {
-    case master = 0
-    case readMessages
-    case readMedia
-    case online
-    case typing
-    case views
-
-    var title: String {
-        switch self {
-        case .master:
-            return strings().generalSettingsGhostModeEnabled
-        case .readMessages:
-            return strings().generalSettingsGhostModeDontReadMessages
-        case .readMedia:
-            return strings().generalSettingsGhostModeDontReadMedia
-        case .online:
-            return strings().generalSettingsGhostModeHideOnline
-        case .typing:
-            return strings().generalSettingsGhostModeHideTyping
-        case .views:
-            return strings().generalSettingsGhostModeDontCountViews
-        }
-    }
-}
-
 private enum GeneralSettingsEntry : Comparable, Identifiable {
     case section(sectionId:Int)
     case header(sectionId: Int, uniqueId:Int, text:String)
@@ -73,11 +47,6 @@ private enum GeneralSettingsEntry : Comparable, Identifiable {
     case previewChats(sectionId:Int, enabled: Bool, viewType: GeneralViewType)
     case previewChatsInfo(sectionId:Int)
     case showProfileId(sectionId:Int, enabled: Bool, viewType: GeneralViewType)
-    case keepDeletedMessages(sectionId:Int, enabled: Bool, viewType: GeneralViewType)
-    case keepDeletedMedia(sectionId:Int, enabled: Bool, viewType: GeneralViewType)
-    case deletedMessagesInfo(sectionId:Int)
-    case ghostMode(sectionId:Int, kind: GhostModeRowKind, enabled: Bool, viewType: GeneralViewType)
-    case ghostModeInfo(sectionId:Int)
     public var stableId: Int {
         switch self {
         case let .header(_, uniqueId, _):
@@ -134,16 +103,6 @@ private enum GeneralSettingsEntry : Comparable, Identifiable {
             return 25
         case .previewChatsInfo:
             return 26
-        case .keepDeletedMessages:
-            return 27
-        case .keepDeletedMedia:
-            return 28
-        case .deletedMessagesInfo:
-            return 29
-        case let .ghostMode(_, kind, _, _):
-            return 30 + kind.rawValue
-        case .ghostModeInfo:
-            return 40
         case let .section(id):
             return (id + 1) * 1000 - id
         }
@@ -204,16 +163,6 @@ private enum GeneralSettingsEntry : Comparable, Identifiable {
         case let .previewChatsInfo(sectionId):
             return (sectionId * 1000) + stableId
         case let .showProfileId(sectionId, _, _):
-            return (sectionId * 1000) + stableId
-        case let .keepDeletedMessages(sectionId, _, _):
-            return (sectionId * 1000) + stableId
-        case let .keepDeletedMedia(sectionId, _, _):
-            return (sectionId * 1000) + stableId
-        case let .deletedMessagesInfo(sectionId):
-            return (sectionId * 1000) + stableId
-        case let .ghostMode(sectionId, _, _, _):
-            return (sectionId * 1000) + stableId
-        case let .ghostModeInfo(sectionId):
             return (sectionId * 1000) + stableId
         case let .section(id):
             return (id + 1) * 1000 - id
@@ -324,22 +273,6 @@ private enum GeneralSettingsEntry : Comparable, Identifiable {
             return GeneralInteractedRowItem(initialSize, name: strings().generalSettingsPreviewChatsText, type: .switchable(value), viewType: viewType, action: arguments.togglePreviewChat)
         case .previewChatsInfo:
             return GeneralTextRowItem(initialSize, stableId: stableId, text: strings().generalSettingsPreviewChatsInfo, viewType: .textBottomItem)
-        case let .keepDeletedMessages(_, enabled, viewType):
-            return GeneralInteractedRowItem(initialSize, stableId: stableId, name: strings().generalSettingsKeepDeletedMessages, type: .switchable(enabled), viewType: viewType, action: {
-                arguments.toggleKeepDeletedMessages(!enabled)
-            })
-        case let .keepDeletedMedia(_, enabled, viewType):
-            return GeneralInteractedRowItem(initialSize, stableId: stableId, name: strings().generalSettingsKeepDeletedMedia, type: .switchable(enabled), viewType: viewType, action: {
-                arguments.toggleKeepDeletedMedia(!enabled)
-            })
-        case .deletedMessagesInfo:
-            return GeneralTextRowItem(initialSize, stableId: stableId, text: strings().generalSettingsDeletedMessagesInfo, viewType: .textBottomItem)
-        case let .ghostMode(_, kind, enabled, viewType):
-            return GeneralInteractedRowItem(initialSize, stableId: stableId, name: kind.title, type: .switchable(enabled), viewType: viewType, action: {
-                arguments.toggleGhostMode(kind, !enabled)
-            })
-        case .ghostModeInfo:
-            return GeneralTextRowItem(initialSize, stableId: stableId, text: strings().generalSettingsGhostModeInfo, viewType: .textBottomItem)
         }
     }
 }
@@ -371,10 +304,7 @@ private final class GeneralSettingsArguments {
     public let toggleSpellingKey:(String)->Void
     public let showProfileId:()->Void
     public let togglePreviewChat:()->Void
-    public let toggleKeepDeletedMessages:(Bool)->Void
-    public let toggleKeepDeletedMedia:(Bool)->Void
-    public let toggleGhostMode:(GhostModeRowKind, Bool)->Void
-    public init(context:any AccountContextProtocol, toggleCallsTab:@escaping(Bool)-> Void, toggleInAppKeys: @escaping(Bool) -> Void, toggleInput: @escaping(SendingType)-> Void, toggleSidebar: @escaping (Bool) -> Void, toggleInAppSounds: @escaping (Bool) -> Void, toggleEmojiReplacements:@escaping(Bool) -> Void, toggleForceTouchAction: @escaping(ForceTouchAction)->Void, toggleInstantViewScrollBySpace: @escaping(Bool)->Void, toggleAutoplayGifs:@escaping(Bool) -> Void, toggleEmojiPrediction: @escaping(Bool) -> Void, toggleBigEmoji: @escaping(Bool) -> Void, toggleStatusBar: @escaping(Bool) -> Void, toggleRTFEnabled: @escaping(Bool)->Void, toggleLargePhotos: @escaping(Bool) -> Void, acceptSecretChats: @escaping(Bool)->Void, toggleWorkMode:@escaping(Bool)->Void, openShortcuts: @escaping()->Void, callSettings: @escaping() ->Void, openLiteMode: @escaping()->Void, toggleSpellingKey:@escaping(String)->Void, showProfileId:@escaping()->Void, togglePreviewChat:@escaping()->Void, toggleKeepDeletedMessages:@escaping(Bool)->Void, toggleKeepDeletedMedia:@escaping(Bool)->Void, toggleGhostMode:@escaping(GhostModeRowKind, Bool)->Void) {
+    public init(context:any AccountContextProtocol, toggleCallsTab:@escaping(Bool)-> Void, toggleInAppKeys: @escaping(Bool) -> Void, toggleInput: @escaping(SendingType)-> Void, toggleSidebar: @escaping (Bool) -> Void, toggleInAppSounds: @escaping (Bool) -> Void, toggleEmojiReplacements:@escaping(Bool) -> Void, toggleForceTouchAction: @escaping(ForceTouchAction)->Void, toggleInstantViewScrollBySpace: @escaping(Bool)->Void, toggleAutoplayGifs:@escaping(Bool) -> Void, toggleEmojiPrediction: @escaping(Bool) -> Void, toggleBigEmoji: @escaping(Bool) -> Void, toggleStatusBar: @escaping(Bool) -> Void, toggleRTFEnabled: @escaping(Bool)->Void, toggleLargePhotos: @escaping(Bool) -> Void, acceptSecretChats: @escaping(Bool)->Void, toggleWorkMode:@escaping(Bool)->Void, openShortcuts: @escaping()->Void, callSettings: @escaping() ->Void, openLiteMode: @escaping()->Void, toggleSpellingKey:@escaping(String)->Void, showProfileId:@escaping()->Void, togglePreviewChat:@escaping()->Void) {
         self.context = context
         self.toggleCallsTab = toggleCallsTab
         self.toggleInAppKeys = toggleInAppKeys
@@ -398,14 +328,11 @@ private final class GeneralSettingsArguments {
         self.showProfileId = showProfileId
         self.togglePreviewChat = togglePreviewChat
         self.toggleLargePhotos = toggleLargePhotos
-        self.toggleKeepDeletedMessages = toggleKeepDeletedMessages
-        self.toggleKeepDeletedMedia = toggleKeepDeletedMedia
-        self.toggleGhostMode = toggleGhostMode
     }
    
 }
 
-private func generalSettingsEntries(arguments:GeneralSettingsArguments, baseSettings: BaseApplicationSettings, appearance: Appearance, launchSettings: LaunchSettings, secretChatSettings: SecretChatSettings, additionalSettings: AdditionalSettings, retentionSettings: DeletedMessagesRetentionSettings, ghostSettings: GhostModeSettings) -> [GeneralSettingsEntry] {
+private func generalSettingsEntries(arguments:GeneralSettingsArguments, baseSettings: BaseApplicationSettings, appearance: Appearance, launchSettings: LaunchSettings, secretChatSettings: SecretChatSettings, additionalSettings: AdditionalSettings) -> [GeneralSettingsEntry] {
     var sectionId:Int = 1
     var entries:[GeneralSettingsEntry] = []
     
@@ -477,33 +404,7 @@ private func generalSettingsEntries(arguments:GeneralSettingsArguments, baseSett
     headerUnique -= 1
     entries.append(.enableRFTCopy(sectionId: sectionId, enabled: FastSettings.enableRTF, viewType: .firstItem))
     entries.append(.sendLargePhotos(sectionId: sectionId, enabled: FastSettings.sendLargePhotos, viewType: .lastItem))
-
-    entries.append(.section(sectionId: sectionId))
-    sectionId += 1
-
-    entries.append(.header(sectionId: sectionId, uniqueId: headerUnique, text: strings().generalSettingsDeletedMessagesHeader))
-    headerUnique -= 1
-    if retentionSettings.keepDeletedMessages {
-        entries.append(.keepDeletedMessages(sectionId: sectionId, enabled: true, viewType: .firstItem))
-        entries.append(.keepDeletedMedia(sectionId: sectionId, enabled: retentionSettings.keepDeletedMedia, viewType: .lastItem))
-    } else {
-        entries.append(.keepDeletedMessages(sectionId: sectionId, enabled: false, viewType: .singleItem))
-    }
-    entries.append(.deletedMessagesInfo(sectionId: sectionId))
-
-    entries.append(.section(sectionId: sectionId))
-    sectionId += 1
-
-    entries.append(.header(sectionId: sectionId, uniqueId: headerUnique, text: strings().generalSettingsGhostModeHeader))
-    headerUnique -= 1
-    entries.append(.ghostMode(sectionId: sectionId, kind: .master, enabled: ghostSettings.isFullyEnabled, viewType: .firstItem))
-    entries.append(.ghostMode(sectionId: sectionId, kind: .readMessages, enabled: !ghostSettings.sendReadMessages, viewType: .innerItem))
-    entries.append(.ghostMode(sectionId: sectionId, kind: .readMedia, enabled: !ghostSettings.sendReadMedia, viewType: .innerItem))
-    entries.append(.ghostMode(sectionId: sectionId, kind: .online, enabled: !ghostSettings.sendOnlinePackets, viewType: .innerItem))
-    entries.append(.ghostMode(sectionId: sectionId, kind: .typing, enabled: !ghostSettings.sendTyping, viewType: .innerItem))
-    entries.append(.ghostMode(sectionId: sectionId, kind: .views, enabled: !ghostSettings.sendViews, viewType: .lastItem))
-    entries.append(.ghostModeInfo(sectionId: sectionId))
-
+    
     entries.append(.section(sectionId: sectionId))
     sectionId += 1
     
@@ -572,10 +473,7 @@ open class GeneralSettingsViewController<Context: AccountContextProtocol>: Table
         let inputPromise:ValuePromise<SendingType> = ValuePromise(FastSettings.sendingType, ignoreRepeated: true)
         
         let forceTouchPromise:ValuePromise<ForceTouchAction> = ValuePromise(FastSettings.forceTouchAction, ignoreRepeated: true)
-
-        let retentionPromise:ValuePromise<DeletedMessagesRetentionSettings> = ValuePromise(DeletedMessagesRetention.settings, ignoreRepeated: true)
-        let ghostPromise:ValuePromise<GhostModeSettings> = ValuePromise(GhostMode.settings, ignoreRepeated: true)
-
+        
         let arguments = GeneralSettingsArguments(context: context, toggleCallsTab: { enable in
             _ = updateBaseAppSettingsInteractively(accountManager: context.sharedContext.accountManager, { settings -> BaseApplicationSettings in
                 return settings.withUpdatedShowCallsTab(enable)
@@ -640,30 +538,6 @@ open class GeneralSettingsViewController<Context: AccountContextProtocol>: Table
             _ = updateAdditionalSettingsInteractively(accountManager: context.sharedContext.accountManager, {
                 $0.withUpdatedPreviewChats(!$0.previewChats)
             }).startStandalone()
-        }, toggleKeepDeletedMessages: { enable in
-            DeletedMessagesRetentionPreferences.keepDeletedMessages = enable
-            retentionPromise.set(DeletedMessagesRetention.settings)
-        }, toggleKeepDeletedMedia: { enable in
-            DeletedMessagesRetentionPreferences.keepDeletedMedia = enable
-            retentionPromise.set(DeletedMessagesRetention.settings)
-        }, toggleGhostMode: { kind, enable in
-            var settings = GhostMode.settings
-            switch kind {
-            case .master:
-                settings = enable ? GhostModeSettings.enabled : GhostModeSettings.disabled
-            case .readMessages:
-                settings.sendReadMessages = !enable
-            case .readMedia:
-                settings.sendReadMedia = !enable
-            case .online:
-                settings.sendOnlinePackets = !enable
-            case .typing:
-                settings.sendTyping = !enable
-            case .views:
-                settings.sendViews = !enable
-            }
-            GhostMode.settings = settings
-            ghostPromise.set(settings)
         })
         
         let initialSize = atomicSize
@@ -672,13 +546,13 @@ open class GeneralSettingsViewController<Context: AccountContextProtocol>: Table
         
         let baseSettingsSignal: Signal<BaseApplicationSettings, NoError> = .single(context.sharedContext.baseSettings) |> then(baseAppSettings(accountManager: context.sharedContext.accountManager))
         
-        let signal = combineLatest(queue: prepareQueue, baseSettingsSignal, inputPromise.get(), forceTouchPromise.get(), appearanceSignal, appLaunchSettings(postbox: context.account.postbox), context.account.postbox.preferencesView(keys: [PreferencesKeys.secretChatSettings]), additionalSettings(accountManager: context.sharedContext.accountManager), retentionPromise.get(), ghostPromise.get()) |> map { settings, _, _, appearance, launchSettings, preferencesView, additionalSettings, retentionSettings, ghostSettings -> TableUpdateTransition in
+        let signal = combineLatest(queue: prepareQueue, baseSettingsSignal, inputPromise.get(), forceTouchPromise.get(), appearanceSignal, appLaunchSettings(postbox: context.account.postbox), context.account.postbox.preferencesView(keys: [PreferencesKeys.secretChatSettings]), additionalSettings(accountManager: context.sharedContext.accountManager)) |> map { settings, _, _, appearance, launchSettings, preferencesView, additionalSettings -> TableUpdateTransition in
             
             let baseSettings: BaseApplicationSettings = settings
             
             let secretChatSettings = preferencesView.values[PreferencesKeys.secretChatSettings]?.get(SecretChatSettings.self) ?? SecretChatSettings.defaultSettings
             
-            let entries = generalSettingsEntries(arguments: arguments, baseSettings: baseSettings, appearance: appearance, launchSettings: launchSettings, secretChatSettings: secretChatSettings, additionalSettings: additionalSettings, retentionSettings: retentionSettings, ghostSettings: ghostSettings).map({AppearanceWrapperEntry(entry: $0, appearance: appearance)})
+            let entries = generalSettingsEntries(arguments: arguments, baseSettings: baseSettings, appearance: appearance, launchSettings: launchSettings, secretChatSettings: secretChatSettings, additionalSettings: additionalSettings).map({AppearanceWrapperEntry(entry: $0, appearance: appearance)})
             let previous = previos.swap(entries)
             return prepareEntries(left: previous, right: entries, arguments: arguments, initialSize: initialSize.modify({$0}))
             
