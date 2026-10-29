@@ -27,15 +27,36 @@ public extension Message {
 public struct DeletedMessagesRetentionSettings: Equatable {
     public var keepDeletedMessages: Bool
     public var keepDeletedMedia: Bool
+    public var keepMediaInPrivateChats: Bool
+    public var keepMediaInGroups: Bool
+    public var keepMediaInChannels: Bool
     public var mediaPrefetchSizeLimit: Int64
 
-    public init(keepDeletedMessages: Bool, keepDeletedMedia: Bool, mediaPrefetchSizeLimit: Int64) {
+    public init(keepDeletedMessages: Bool, keepDeletedMedia: Bool, keepMediaInPrivateChats: Bool, keepMediaInGroups: Bool, keepMediaInChannels: Bool, mediaPrefetchSizeLimit: Int64) {
         self.keepDeletedMessages = keepDeletedMessages
         self.keepDeletedMedia = keepDeletedMedia
+        self.keepMediaInPrivateChats = keepMediaInPrivateChats
+        self.keepMediaInGroups = keepMediaInGroups
+        self.keepMediaInChannels = keepMediaInChannels
         self.mediaPrefetchSizeLimit = mediaPrefetchSizeLimit
     }
 
-    public static let disabled = DeletedMessagesRetentionSettings(keepDeletedMessages: false, keepDeletedMedia: false, mediaPrefetchSizeLimit: 0)
+    public static let disabled = DeletedMessagesRetentionSettings(keepDeletedMessages: false, keepDeletedMedia: false, keepMediaInPrivateChats: true, keepMediaInGroups: true, keepMediaInChannels: true, mediaPrefetchSizeLimit: 0)
+
+    func keepsMedia(in peer: Peer) -> Bool {
+        if peer is TelegramUser || peer is TelegramSecretChat {
+            return self.keepMediaInPrivateChats
+        } else if peer is TelegramGroup {
+            return self.keepMediaInGroups
+        } else if let channel = peer as? TelegramChannel {
+            if case .broadcast = channel.info {
+                return self.keepMediaInChannels
+            } else {
+                return self.keepMediaInGroups
+            }
+        }
+        return false
+    }
 }
 
 public enum DeletedMessagesRetention {
@@ -186,7 +207,7 @@ enum DeletedMediaPrefetch {
         let _ = (postbox.transaction { transaction -> [(AnyMediaReference, TelegramMediaResource)] in
             var result: [(AnyMediaReference, TelegramMediaResource)] = []
             for id in messageIds {
-                if let channel = transaction.getPeer(id.peerId) as? TelegramChannel, case .broadcast = channel.info {
+                guard let peer = transaction.getPeer(id.peerId), settings.keepsMedia(in: peer) else {
                     continue
                 }
                 guard let message = transaction.getMessage(id), message.flags.contains(.Incoming) else {

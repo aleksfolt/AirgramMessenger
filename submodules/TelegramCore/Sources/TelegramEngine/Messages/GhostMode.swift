@@ -108,8 +108,22 @@ public enum GhostMode {
             }
             return current
         }
+        self.persistOverrides(updated.overrides)
+    }
+
+    public static func removeOverride(peerId: PeerId) {
+        let key = peerId.toInt64()
+        let updated = self.state.modify { current in
+            var current = current
+            current.overrides.removeValue(forKey: key)
+            return current
+        }
+        self.persistOverrides(updated.overrides)
+    }
+
+    private static func persistOverrides(_ overrides: [Int64: Bool]) {
         var stored: [String: Bool] = [:]
-        for (key, value) in updated.overrides {
+        for (key, value) in overrides {
             stored[String(key)] = value
         }
         UserDefaults.standard.set(stored, forKey: self.overridesKey)
