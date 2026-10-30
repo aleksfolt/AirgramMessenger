@@ -136,7 +136,7 @@ private func entries(_ state: State, arguments: Arguments) -> [InputDataEntry] {
         let isOn = row.isOn(state.retention)
         entries.append(.general(sectionId: sectionId, index: index, value: .none, error: nil, identifier: _id_retention(row), data: .init(name: row.title, color: theme.colors.text, type: .switchable(isOn), viewType: bestGeneralViewType(rows, for: row), action: {
             arguments.toggle(row, !isOn)
-        })))
+        }, autoswitch: false)))
         index += 1
     }
 
@@ -171,7 +171,7 @@ public func AirgramFeaturesController(context: any AccountContextProtocol) -> In
     })
 
     let signal = statePromise.get() |> map { state in
-        return InputDataSignalValue(entries: entries(state, arguments: arguments), animated: false)
+        return InputDataSignalValue(entries: entries(state, arguments: arguments))
     }
 
     let controller = InputDataController(dataSignal: signal, title: strings().airgramHubCategoryAirgram, removeAfterDisappear: false, hasDone: false)

@@ -114,7 +114,7 @@ private func entries(_ state: State, category: AirgramPreferencesCategory, argum
             let isOn = row.isOn
             entries.append(.general(sectionId: sectionId, index: index, value: .none, error: nil, identifier: _id_row(row), data: .init(name: row.title, color: theme.colors.text, type: .switchable(isOn), viewType: bestGeneralViewType(rows, for: row), action: {
                 arguments.toggle(row, !isOn)
-            })))
+            }, autoswitch: false)))
             index += 1
         }
         if let notice {
@@ -158,7 +158,7 @@ func AirgramPreferencesController(context: any AccountContextProtocol, category:
     })
 
     let signal = statePromise.get() |> map { state in
-        return InputDataSignalValue(entries: entries(state, category: category, arguments: arguments), animated: false)
+        return InputDataSignalValue(entries: entries(state, category: category, arguments: arguments))
     }
 
     return InputDataController(dataSignal: signal, title: category.title, removeAfterDisappear: false, hasDone: false)

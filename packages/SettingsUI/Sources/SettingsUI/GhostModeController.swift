@@ -104,7 +104,7 @@ private func entries(_ state: State, arguments: Arguments) -> [InputDataEntry] {
 
     entries.append(.general(sectionId: sectionId, index: index, value: .none, error: nil, identifier: _id_switch(.master), data: .init(name: GhostModeSwitch.master.title, color: theme.colors.text, type: .switchable(GhostModeSwitch.master.isOn(state.settings)), viewType: .singleItem, action: {
         arguments.toggle(.master, !GhostModeSwitch.master.isOn(state.settings))
-    })))
+    }, autoswitch: false)))
     index += 1
 
     entries.append(.desc(sectionId: sectionId, index: index, text: .plain(strings().airgramGhostModeNotice), data: .init(color: theme.colors.listGrayText, viewType: .textBottomItem)))
@@ -121,7 +121,7 @@ private func entries(_ state: State, arguments: Arguments) -> [InputDataEntry] {
         let isOn = detail.isOn(state.settings)
         entries.append(.general(sectionId: sectionId, index: index, value: .none, error: nil, identifier: _id_switch(detail), data: .init(name: detail.title, color: theme.colors.text, type: .switchable(isOn), viewType: bestGeneralViewType(details, for: detail), action: {
             arguments.toggle(detail, !isOn)
-        })))
+        }, autoswitch: false)))
         index += 1
     }
 
@@ -165,7 +165,7 @@ public func GhostModeController(context: any AccountContextProtocol) -> InputDat
     })
 
     let signal = statePromise.get() |> map { state in
-        return InputDataSignalValue(entries: entries(state, arguments: arguments), animated: false)
+        return InputDataSignalValue(entries: entries(state, arguments: arguments))
     }
 
     let controller = InputDataController(dataSignal: signal, title: strings().airgramGhostModeTitle, removeAfterDisappear: false, hasDone: false)
