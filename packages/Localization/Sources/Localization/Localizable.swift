@@ -5862,6 +5862,48 @@ public final class L10n {
   public static var airgramRetentionKeepDeletedMediaGroups: String  { return L10n.tr("Localizable", "Airgram.Retention.KeepDeletedMedia.Groups") }
   /// Channels
   public static var airgramRetentionKeepDeletedMediaChannels: String  { return L10n.tr("Localizable", "Airgram.Retention.KeepDeletedMedia.Channels") }
+  /// Profiles
+  public static var airgramHubCategoryProfiles: String  { return L10n.tr("Localizable", "Airgram.Hub.Category.Profiles") }
+  /// Interface
+  public static var airgramHubCategoryInterface: String  { return L10n.tr("Localizable", "Airgram.Hub.Category.Interface") }
+  /// Media
+  public static var airgramHubCategoryMedia: String  { return L10n.tr("Localizable", "Airgram.Hub.Category.Media") }
+  /// PROFILES
+  public static var airgramProfilesHeader: String  { return L10n.tr("Localizable", "Airgram.Profiles.Header") }
+  /// Show Profile ID
+  public static var airgramProfilesShowProfileId: String  { return L10n.tr("Localizable", "Airgram.Profiles.ShowProfileId") }
+  /// Call Confirmation
+  public static var airgramProfilesCallConfirmation: String  { return L10n.tr("Localizable", "Airgram.Profiles.CallConfirmation") }
+  /// AirGram will ask for your confirmation before making a call.
+  public static var airgramProfilesCallConfirmationNotice: String  { return L10n.tr("Localizable", "Airgram.Profiles.CallConfirmation.Notice") }
+  /// OTHER
+  public static var airgramInterfaceHeader: String  { return L10n.tr("Localizable", "Airgram.Interface.Header") }
+  /// Seconds in Messages
+  public static var airgramInterfaceSecondsInMessages: String  { return L10n.tr("Localizable", "Airgram.Interface.SecondsInMessages") }
+  /// Hide Phone in Settings
+  public static var airgramInterfaceHidePhone: String  { return L10n.tr("Localizable", "Airgram.Interface.HidePhone") }
+  /// PHOTOS
+  public static var airgramMediaHeader: String  { return L10n.tr("Localizable", "Airgram.Media.Header") }
+  /// Send HD Photos
+  public static var airgramMediaSendHdPhotos: String  { return L10n.tr("Localizable", "Airgram.Media.SendHdPhotos") }
+  /// Keep View-Once Media
+  public static var airgramRetentionKeepViewOnceMedia: String  { return L10n.tr("Localizable", "Airgram.Retention.KeepViewOnceMedia") }
+  /// Hidden Users
+  public static var airgramHiddenUsersTitle: String  { return L10n.tr("Localizable", "Airgram.HiddenUsers.Title") }
+  /// Messages from these users are hidden in the chats listed above. This only affects this device.
+  public static var airgramHiddenUsersNotice: String  { return L10n.tr("Localizable", "Airgram.HiddenUsers.Notice") }
+  /// You haven't hidden anyone yet.
+  public static var airgramHiddenUsersEmpty: String  { return L10n.tr("Localizable", "Airgram.HiddenUsers.Empty") }
+  /// Hide Messages
+  public static var airgramHideMessagesTitle: String  { return L10n.tr("Localizable", "Airgram.HideMessages.Title") }
+  /// Messages from %@ are hidden
+  public static func airgramHideMessagesDone(_ p1: String) -> String {
+    return L10n.tr("Localizable", "Airgram.HideMessages.Done", p1)
+  }
+  /// Make a Call?
+  public static var airgramCallConfirmationAudio: String  { return L10n.tr("Localizable", "Airgram.CallConfirmation.Audio") }
+  /// Make a Video Call?
+  public static var airgramCallConfirmationVideo: String  { return L10n.tr("Localizable", "Airgram.CallConfirmation.Video") }
   /// Ghost Mode
   public static var airgramGhostModeTitle: String  { return L10n.tr("Localizable", "Airgram.GhostMode.Title") }
   /// Ghost Mode

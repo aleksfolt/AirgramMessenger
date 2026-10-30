@@ -8,8 +8,14 @@ import TelegramTheme
 import InputDataUI
 import GeneralRows
 
+private enum PrivacyRow: Int {
+    case ghostMode
+    case hiddenUsers
+}
+
 private enum RetentionRow: Int {
     case messages
+    case viewOnce
     case media
     case privateChats
     case groups
@@ -19,6 +25,8 @@ private enum RetentionRow: Int {
         switch self {
         case .messages:
             return strings().airgramRetentionKeepDeletedMessages
+        case .viewOnce:
+            return strings().airgramRetentionKeepViewOnceMedia
         case .media:
             return strings().airgramRetentionKeepDeletedMedia
         case .privateChats:
@@ -34,6 +42,8 @@ private enum RetentionRow: Int {
         switch self {
         case .messages:
             return settings.keepDeletedMessages
+        case .viewOnce:
+            return AirgramSettings.keepViewOnceMedia
         case .media:
             return settings.keepDeletedMedia
         case .privateChats:
@@ -49,6 +59,8 @@ private enum RetentionRow: Int {
         switch self {
         case .messages:
             DeletedMessagesRetentionPreferences.keepDeletedMessages = value
+        case .viewOnce:
+            AirgramSettings.keepViewOnceMedia = value
         case .media:
             DeletedMessagesRetentionPreferences.keepDeletedMedia = value
         case .privateChats:
@@ -64,20 +76,24 @@ private enum RetentionRow: Int {
 private final class Arguments {
     let context: any AccountContextProtocol
     let openGhostMode: () -> Void
+    let openHiddenUsers: () -> Void
     let toggle: (RetentionRow, Bool) -> Void
-    init(context: any AccountContextProtocol, openGhostMode: @escaping () -> Void, toggle: @escaping (RetentionRow, Bool) -> Void) {
+    init(context: any AccountContextProtocol, openGhostMode: @escaping () -> Void, openHiddenUsers: @escaping () -> Void, toggle: @escaping (RetentionRow, Bool) -> Void) {
         self.context = context
         self.openGhostMode = openGhostMode
+        self.openHiddenUsers = openHiddenUsers
         self.toggle = toggle
     }
 }
 
 private struct State: Equatable {
     var retention: DeletedMessagesRetentionSettings
+    var viewOnce: Bool
     var ghostModeEnabled: Bool
 }
 
 private let _id_ghost_mode = InputDataIdentifier("_id_ghost_mode")
+private let _id_hidden_users = InputDataIdentifier("_id_hidden_users")
 
 private func _id_retention(_ row: RetentionRow) -> InputDataIdentifier {
     return InputDataIdentifier("_id_retention_\(row.rawValue)")
@@ -95,8 +111,16 @@ private func entries(_ state: State, arguments: Arguments) -> [InputDataEntry] {
     entries.append(.desc(sectionId: sectionId, index: index, text: .plain(strings().airgramFeaturesGhostPrivacy), data: .init(color: theme.colors.listGrayText, viewType: .textTopItem)))
     index += 1
 
-    entries.append(.general(sectionId: sectionId, index: index, value: .none, error: nil, identifier: _id_ghost_mode, data: .init(name: strings().airgramGhostModeTitle, color: theme.colors.text, type: .nextContext(state.ghostModeEnabled ? strings().airgramGhostModeOn : strings().airgramGhostModeOff), viewType: .singleItem, action: arguments.openGhostMode)))
-    index += 1
+    let privacyRows: [PrivacyRow] = [.ghostMode, .hiddenUsers]
+    for row in privacyRows {
+        switch row {
+        case .ghostMode:
+            entries.append(.general(sectionId: sectionId, index: index, value: .none, error: nil, identifier: _id_ghost_mode, data: .init(name: strings().airgramGhostModeTitle, color: theme.colors.text, type: .nextContext(state.ghostModeEnabled ? strings().airgramGhostModeOn : strings().airgramGhostModeOff), viewType: bestGeneralViewType(privacyRows, for: row), action: arguments.openGhostMode)))
+        case .hiddenUsers:
+            entries.append(.general(sectionId: sectionId, index: index, value: .none, error: nil, identifier: _id_hidden_users, data: .init(name: strings().airgramHiddenUsersTitle, color: theme.colors.text, type: .next, viewType: bestGeneralViewType(privacyRows, for: row), action: arguments.openHiddenUsers)))
+        }
+        index += 1
+    }
 
     entries.append(.sectionId(sectionId, type: .normal))
     sectionId += 1
@@ -104,7 +128,7 @@ private func entries(_ state: State, arguments: Arguments) -> [InputDataEntry] {
     entries.append(.desc(sectionId: sectionId, index: index, text: .plain(strings().airgramFeaturesRetention), data: .init(color: theme.colors.listGrayText, viewType: .textTopItem)))
     index += 1
 
-    var rows: [RetentionRow] = [.messages, .media]
+    var rows: [RetentionRow] = [.messages, .viewOnce, .media]
     if state.retention.keepDeletedMedia {
         rows += [.privateChats, .groups, .channels]
     }
@@ -124,7 +148,7 @@ private func entries(_ state: State, arguments: Arguments) -> [InputDataEntry] {
 
 public func AirgramFeaturesController(context: any AccountContextProtocol) -> InputDataController {
 
-    let initialState = State(retention: DeletedMessagesRetention.settings, ghostModeEnabled: GhostMode.settings.isFullyEnabled)
+    let initialState = State(retention: DeletedMessagesRetention.settings, viewOnce: AirgramSettings.keepViewOnceMedia, ghostModeEnabled: GhostMode.settings.isFullyEnabled)
 
     let statePromise = ValuePromise(initialState, ignoreRepeated: true)
     let stateValue = Atomic(value: initialState)
@@ -134,20 +158,23 @@ public func AirgramFeaturesController(context: any AccountContextProtocol) -> In
 
     let arguments = Arguments(context: context, openGhostMode: {
         context.bindings.rootNavigation().push(GhostModeController(context: context))
+    }, openHiddenUsers: {
+        context.bindings.rootNavigation().push(HiddenUsersController(context: context))
     }, toggle: { row, value in
         row.set(value)
         updateState { current in
             var current = current
             current.retention = DeletedMessagesRetention.settings
+            current.viewOnce = AirgramSettings.keepViewOnceMedia
             return current
         }
     })
 
-    let signal = statePromise.get() |> deliverOnPrepareQueue |> map { state in
-        return InputDataSignalValue(entries: entries(state, arguments: arguments))
+    let signal = statePromise.get() |> map { state in
+        return InputDataSignalValue(entries: entries(state, arguments: arguments), animated: false)
     }
 
-    let controller = InputDataController(dataSignal: signal, title: strings().airgramHubCategoryAirgram)
+    let controller = InputDataController(dataSignal: signal, title: strings().airgramHubCategoryAirgram, removeAfterDisappear: false, hasDone: false)
 
     controller.didAppear = { _ in
         updateState { current in

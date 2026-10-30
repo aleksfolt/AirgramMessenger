@@ -164,11 +164,11 @@ public func GhostModeController(context: any AccountContextProtocol) -> InputDat
         context.bindings.rootNavigation().push(GhostModeExceptionsController(context: context))
     })
 
-    let signal = statePromise.get() |> deliverOnPrepareQueue |> map { state in
-        return InputDataSignalValue(entries: entries(state, arguments: arguments))
+    let signal = statePromise.get() |> map { state in
+        return InputDataSignalValue(entries: entries(state, arguments: arguments), animated: false)
     }
 
-    let controller = InputDataController(dataSignal: signal, title: strings().airgramGhostModeTitle)
+    let controller = InputDataController(dataSignal: signal, title: strings().airgramGhostModeTitle, removeAfterDisappear: false, hasDone: false)
 
     controller.didAppear = { _ in
         updateState { current in

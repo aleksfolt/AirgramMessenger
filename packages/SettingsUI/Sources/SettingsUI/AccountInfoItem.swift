@@ -69,7 +69,7 @@ public class AccountInfoItem: GeneralRowItem {
         activeTitle.addAttribute(.foregroundColor, value: theme.colors.underSelectedColor, range: titleAttr.range)
         self.titleActiveLayout = .init(activeTitle, maximumNumberOfLines: 1)
         
-        if let phone = peer.phone {
+        if let phone = peer.phone, !AirgramSettings.hidePhoneInSettings {
             _ = attr.append(string: SettingsHooks.shared.formatPhoneNumber(context, phone), color: theme.colors.grayText, font: .normal(.text))
         }
         if let username = peer.username, !username.isEmpty {

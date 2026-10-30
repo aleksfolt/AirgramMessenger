@@ -137,7 +137,7 @@ private final class AnyUpdateStateEquatable  : Equatable {
 
 
 private enum AccountInfoEntry<Context: AccountContextProtocol> : TableItemListNodeEntry {
-    case info(index:Int, viewType: GeneralViewType, PeerEquatable, EngineStorySubscriptions.Item?)
+    case info(index:Int, viewType: GeneralViewType, PeerEquatable, EngineStorySubscriptions.Item?, hidePhone: Bool)
     case setStatus(index:Int, viewType: GeneralViewType, PeerEquatable)
     case setProfileColor(index:Int, viewType: GeneralViewType, PeerEquatable)
     case set2FaAlert(index:Int, viewType: GeneralViewType)
@@ -245,7 +245,7 @@ private enum AccountInfoEntry<Context: AccountContextProtocol> : TableItemListNo
     
     var index:Int {
         switch self {
-        case let .info(index, _, _, _):
+        case let .info(index, _, _, _, _):
             return index
         case let .setStatus(index, _, _):
             return index
@@ -320,7 +320,7 @@ private enum AccountInfoEntry<Context: AccountContextProtocol> : TableItemListNo
     
     func item(_ arguments: AccountInfoArguments<Context>, initialSize: NSSize) -> TableRowItem {
         switch self {
-        case let .info(_, viewType, peer, storyStats):
+        case let .info(_, viewType, peer, storyStats, _):
             return AccountInfoItem(initialSize, stableId: stableId, viewType: viewType, inset: NSEdgeInsets(left: 12, right: 12), context: arguments.context, peer: peer.peer as! TelegramUser, storyStats: storyStats, action: {
                 let first: Atomic<Bool> = Atomic(value: true)
                 EditAccountInfoController(context: arguments.context, f: { controller in
@@ -549,7 +549,7 @@ private func accountInfoEntries<Context: AccountContextProtocol>(peerView:PeerVi
     if let peer = peerViewMainPeer(peerView) as? TelegramUser {
 //        entries.append(.whiteSpace(index: index, height: 20))
 //        index += 1
-        entries.append(.info(index: index, viewType: .singleItem, PeerEquatable(peer), storyStats?.accountItem))
+        entries.append(.info(index: index, viewType: .singleItem, PeerEquatable(peer), storyStats?.accountItem, hidePhone: AirgramSettings.hidePhoneInSettings))
         index += 1
         
 //        entries.append(.whiteSpace(index: index, height: 20))
@@ -1220,7 +1220,7 @@ open class AccountViewController<Context: AccountContextProtocol> : TelegramGene
             walletBalance = .single(nil)
         }
 
-        let apply = combineLatest(queue: prepareQueue, context.account.viewTracker.peerView(context.account.peerId), context.sharedContext.activeAccountsWithInfo, appearanceSignal, settings.get(), appUpdateState, hasFilters.get(), sessionsCount, SettingsHooks.shared.authorizationStatus(context), twoStep, storyStats, acceptBots.get(), context.starsContext.state, context.tonContext.state, walletBalance) |> map { peerView, accounts, appearance, settings, appUpdateState, hasFilters, sessionsCount, unAuthStatus, twoStepConfiguration, storyStats, attachMenuBots, stars, ton, walletBalance -> TableUpdateTransition in
+        let apply = combineLatest(queue: prepareQueue, context.account.viewTracker.peerView(context.account.peerId), context.sharedContext.activeAccountsWithInfo, appearanceSignal, settings.get(), appUpdateState, hasFilters.get(), sessionsCount, SettingsHooks.shared.authorizationStatus(context), twoStep, storyStats, acceptBots.get(), context.starsContext.state, context.tonContext.state, walletBalance, AirgramSettings.changes) |> map { peerView, accounts, appearance, settings, appUpdateState, hasFilters, sessionsCount, unAuthStatus, twoStepConfiguration, storyStats, attachMenuBots, stars, ton, walletBalance, _ -> TableUpdateTransition in
             let entries = accountInfoEntries(peerView: peerView, context: context, accounts: accounts.accounts, language: appearance.language, privacySettings: settings.0, webSessions: settings.1, proxySettings: settings.2, passportVisible: settings.3.0, appUpdateState: appUpdateState, hasFilters: hasFilters, sessionsCount: sessionsCount, unAuthStatus: unAuthStatus, has2fa: settings.3.1, twoStepConfiguration: twoStepConfiguration, storyStats: storyStats, attachMenuBots: attachMenuBots, stars: stars, ton: ton, walletBalance: walletBalance).map {AppearanceWrapperEntry(entry: $0, appearance: appearance)}
             var size = atomicSize.modify {$0}
             size.width = max(size.width, 280)

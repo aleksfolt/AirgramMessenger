@@ -9,8 +9,8 @@ enum AirgramBranding {
         return "\(version) (\(build))"
     }
 
-    static func logo(size: NSSize, cornerRadius: CGFloat) -> CGImage? {
-        guard let source = NSImage(named: "Icon_AirGram_Logo")?.precomposed(flipVertical: true) else {
+    static func logo(size: NSSize, cornerRadius: CGFloat, forList: Bool) -> CGImage? {
+        guard let source = NSImage(named: "Icon_AirGram_Logo")?.precomposed(flipVertical: forList) else {
             return nil
         }
         return generateImage(size, contextGenerator: { size, ctx in
@@ -21,7 +21,7 @@ enum AirgramBranding {
     }
 
     static var settingsLogo: CGImage? {
-        return logo(size: NSMakeSize(24, 24), cornerRadius: 5)
+        return logo(size: NSMakeSize(24, 24), cornerRadius: 5, forList: true)
     }
 
     static func categoryIcon(symbol: String, color: String) -> CGImage? {

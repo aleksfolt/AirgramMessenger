@@ -3824,6 +3824,12 @@ open class ChatController<Context: AccountContextProtocol>: TelegramGenericViewC
             recommendedChannels = .single(nil)
         }
         
+        let hiddenAuthors: Signal<Set<Int64>, NoError>
+        if peerId.namespace == Namespaces.Peer.CloudGroup || peerId.namespace == Namespaces.Peer.CloudChannel {
+            hiddenAuthors = AirgramSettings.hiddenAuthorsSignal(peerId: peerId)
+        } else {
+            hiddenAuthors = .single(Set())
+        }
         
         let onlineCounterMode: Signal<Int, NoError> = peerView.get() |> map { view -> Int in
             guard let peerView = view as? PeerView, let peer = peerViewMainPeer(peerView), peer.isSupergroup || peer.isGigagroup, let cachedData = peerView.cachedData as? CachedChannelData else {
@@ -4042,8 +4048,9 @@ open class ChatController<Context: AccountContextProtocol>: TelegramGenericViewC
                                                   reactions,
                                                   historyUiState,
                                                   historyPeerView,
-                                                  recommendedChannels
-    ) |> mapToQueue { update, appearance, maxReadIndex, searchState, animatedEmojiStickers, messageEffects, savedMessageTags, customChannelDiscussionReadState, customThreadOutgoingReadState, updatingMedia, adMessages, reactions, uiState, peerView, recommendedChannels -> Signal<(TableUpdateTransition, MessageHistoryView?, ChatHistoryCombinedInitialData, Bool, ChatHistoryView), NoError> in
+                                                  recommendedChannels,
+                                                  hiddenAuthors
+    ) |> mapToQueue { update, appearance, maxReadIndex, searchState, animatedEmojiStickers, messageEffects, savedMessageTags, customChannelDiscussionReadState, customThreadOutgoingReadState, updatingMedia, adMessages, reactions, uiState, peerView, recommendedChannels, hiddenAuthorIds -> Signal<(TableUpdateTransition, MessageHistoryView?, ChatHistoryCombinedInitialData, Bool, ChatHistoryView), NoError> in
                                     
             let pollAnswersLoading = uiState.pollAnswers
             let threadLoading = uiState.threadLoading
@@ -4131,7 +4138,17 @@ open class ChatController<Context: AccountContextProtocol>: TelegramGenericViewC
                 if let peerView = peerView as? PeerView, let peer = peerView.peers[peerView.peerId], peer.isRestrictedChannel(context.contentSettings) {
                     proccesedView = ChatHistoryView(originalView: view, filteredEntries: [], theme: chatTheme)
                 } else {
-                    let msgEntries = view.entries
+                    let msgEntries: [MessageHistoryEntry]
+                    if hiddenAuthorIds.isEmpty {
+                        msgEntries = view.entries
+                    } else {
+                        msgEntries = view.entries.filter { entry in
+                            guard let author = entry.message.author else {
+                                return true
+                            }
+                            return !hiddenAuthorIds.contains(author.id.toInt64())
+                        }
+                    }
                     
                     let topMessages: [Message]?
                     switch chatLocation {

@@ -1488,6 +1488,13 @@ public func chatMenuItems(for message: Message, entry: ChatHistoryEntry?, textLa
                         
             fifthBlock.append(reportItem)
         }
+        
+        if !isService, !data.isLogInteraction, data.chatMode != .pinned, peerId.namespace == Namespaces.Peer.CloudGroup || peerId.namespace == Namespaces.Peer.CloudChannel, let author = message.author, author.id != context.peerId, author.id != peerId {
+            fifthBlock.append(ContextMenuItem(strings().airgramHideMessagesTitle, handler: {
+                AirgramSettings.setAuthorHidden(true, peerId: peerId, authorId: author.id)
+                showModalText(for: context.window, text: strings().airgramHideMessagesDone(author.compactDisplayTitle))
+            }, itemImage: MenuAnimation.menu_hide.value))
+        }
 //        if let peer = data.peer as? TelegramChannel, peer.isSupergroup, data.chatMode == .history {
 //            if peer.groupAccess.canEditMembers, let author = data.message.author {
 //                if author.id != context.peerId, data.message.flags.contains(.Incoming), author.isUser || author.isBot {

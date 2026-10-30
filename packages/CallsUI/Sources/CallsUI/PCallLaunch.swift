@@ -13,6 +13,13 @@ import TelegramUtils
 import Localization
 import TelegramContext
 
+private func airgramCallConfirmation(window: Window?, isVideo: Bool) -> Signal<Bool, NoError> {
+    guard AirgramSettings.confirmCalls, let window else {
+        return .single(true)
+    }
+    return verifyAlertSignal(for: window, information: isVideo ? strings().airgramCallConfirmationVideo : strings().airgramCallConfirmationAudio) |> map { $0 != nil }
+}
+
 public enum PCallResult {
     case success(PCallSession)
     case fail
@@ -76,7 +83,7 @@ public func phoneCall(account: Account, sharedContext: any SharedAccountContextP
             }
         }
         if microAccess {
-            return makeNewCallConfirmation(sharedContext: sharedContext, account: account, window: alertWindow, newPeerId: peerId, newCallType: .call, ignoreSame: ignoreSame) |> mapToSignal { value -> Signal<Bool, NoError> in
+            let call: Signal<PCallResult, NoError> = makeNewCallConfirmation(sharedContext: sharedContext, account: account, window: alertWindow, newPeerId: peerId, newCallType: .call, ignoreSame: ignoreSame) |> mapToSignal { value -> Signal<Bool, NoError> in
                 if ignoreSame {
                     return .single(value)
                 } else {
@@ -93,6 +100,9 @@ public func phoneCall(account: Account, sharedContext: any SharedAccountContextP
             |> deliverOnMainQueue
             |> map { id, data in
                 return .success(PCallSession(sharedContext: sharedContext, account: account, isOutgoing: true, incomingConferenceSource: nil, incomingParticipants: [], peerId: peerId, id: id, initialState: nil, startWithVideo: isVideo, isVideoPossible: isVideoPossible, data: data))
+            }
+            return airgramCallConfirmation(window: alertWindow, isVideo: isVideo) |> mapToSignal { confirmed -> Signal<PCallResult, NoError> in
+                return confirmed ? call : .complete()
             }
         } else {
             if let alertWindow {

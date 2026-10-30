@@ -136,7 +136,7 @@ public func GhostModeExceptionsController(context: any AccountContextProtocol) -
         return InputDataSignalValue(entries: entries(state, arguments: arguments))
     }
 
-    let controller = InputDataController(dataSignal: signal, title: strings().airgramGhostModePerChatTitle)
+    let controller = InputDataController(dataSignal: signal, title: strings().airgramGhostModePerChatTitle, removeAfterDisappear: false, hasDone: false)
 
     controller.onDeinit = {
         actionsDisposable.dispose()
