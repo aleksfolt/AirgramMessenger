@@ -90,8 +90,9 @@ func managedAutoremoveMessageOperations(network: Network, postbox: Postbox, isRe
                                 if let forwardInfo = currentMessage.forwardInfo {
                                     storeForwardInfo = StoreMessageForwardInfo(authorId: forwardInfo.author?.id, sourceId: forwardInfo.source?.id, sourceMessageId: forwardInfo.sourceMessageId, date: forwardInfo.date, authorSignature: forwardInfo.authorSignature, psaType: forwardInfo.psaType, flags: forwardInfo.flags)
                                 }
+                                let preserveMedia = shouldPreserveViewOnceMedia(message: currentMessage)
                                 var updatedMedia = currentMessage.media
-                                for i in 0 ..< updatedMedia.count {
+                                for i in 0 ..< (preserveMedia ? 0 : updatedMedia.count) {
                                     if let _ = updatedMedia[i] as? TelegramMediaImage {
                                         updatedMedia[i] = TelegramMediaExpiredContent(data: .image)
                                     } else if let file = updatedMedia[i] as? TelegramMediaFile {
@@ -111,7 +112,18 @@ func managedAutoremoveMessageOperations(network: Network, postbox: Postbox, isRe
                                         break
                                     }
                                 }
-                                return .update(StoreMessage(id: currentMessage.id, customStableId: nil, globallyUniqueId: currentMessage.globallyUniqueId, groupingKey: currentMessage.groupingKey, threadId: currentMessage.threadId, timestamp: currentMessage.timestamp, flags: StoreMessageFlags(currentMessage.flags), tags: currentMessage.tags, globalTags: currentMessage.globalTags, localTags: currentMessage.localTags, forwardInfo: storeForwardInfo, authorId: currentMessage.author?.id, text: currentMessage.text, attributes: updatedAttributes, media: updatedMedia))
+                                var updatedTags = currentMessage.tags
+                                var updatedGlobalTags = currentMessage.globalTags
+                                if preserveMedia {
+                                    if !updatedAttributes.contains(where: { $0 is PreservedViewOnceMediaAttribute }) {
+                                        updatedAttributes.append(PreservedViewOnceMediaAttribute())
+                                    }
+                                    (updatedTags, updatedGlobalTags) = tagsForPreservedViewOnceMedia(message: currentMessage, attributes: updatedAttributes, media: updatedMedia)
+                                    var resourceIds: [MediaResourceId] = []
+                                    addMessageMediaResourceIdsToRemove(message: currentMessage, resourceIds: &resourceIds)
+                                    DeletedMediaProtection.shared.protect(basePath: postbox.mediaBox.basePath, ids: resourceIds)
+                                }
+                                return .update(StoreMessage(id: currentMessage.id, customStableId: nil, globallyUniqueId: currentMessage.globallyUniqueId, groupingKey: currentMessage.groupingKey, threadId: currentMessage.threadId, timestamp: currentMessage.timestamp, flags: StoreMessageFlags(currentMessage.flags), tags: updatedTags, globalTags: updatedGlobalTags, localTags: currentMessage.localTags, forwardInfo: storeForwardInfo, authorId: currentMessage.author?.id, text: currentMessage.text, attributes: updatedAttributes, media: updatedMedia))
                             })
                         }
                     } else {

@@ -898,7 +898,7 @@ private func validateBatch(postbox: Postbox, network: Network, transaction: Tran
                                             if currentMessage.localTags.contains(.OutgoingLiveLocation) {
                                                 updatedLocalTags.insert(.OutgoingLiveLocation)
                                             }
-                                            return .update(storeMessageWithUpdatedEditHistory(previousMessage: currentMessage, updatedMessage: message.withUpdatedLocalTags(updatedLocalTags)))
+                                            return .update(storeMessageWithPreservedViewOnceMedia(previousMessage: currentMessage, updatedMessage: storeMessageWithUpdatedEditHistory(previousMessage: currentMessage, updatedMessage: message.withUpdatedLocalTags(updatedLocalTags))))
                                         } else {
                                             var storeForwardInfo: StoreMessageForwardInfo?
                                             if let forwardInfo = currentMessage.forwardInfo {
@@ -1142,7 +1142,7 @@ private func validateReplyThreadBatch(postbox: Postbox, network: Network, transa
                                         if currentMessage.localTags.contains(.OutgoingLiveLocation) {
                                             updatedLocalTags.insert(.OutgoingLiveLocation)
                                         }
-                                        return .update(storeMessageWithUpdatedEditHistory(previousMessage: currentMessage, updatedMessage: message.withUpdatedLocalTags(updatedLocalTags)))
+                                        return .update(storeMessageWithPreservedViewOnceMedia(previousMessage: currentMessage, updatedMessage: storeMessageWithUpdatedEditHistory(previousMessage: currentMessage, updatedMessage: message.withUpdatedLocalTags(updatedLocalTags))))
                                     } else {
                                         var storeForwardInfo: StoreMessageForwardInfo?
                                         if let forwardInfo = currentMessage.forwardInfo {

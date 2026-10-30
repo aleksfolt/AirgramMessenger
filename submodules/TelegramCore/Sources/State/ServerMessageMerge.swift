@@ -41,5 +41,5 @@ func mergedServerMessageUpdate(previous previousMessage: Message, updated messag
         updatedMedia = previousMessage.media
     }
 
-    return storeMessageWithUpdatedEditHistory(previousMessage: previousMessage, updatedMessage: message.withUpdatedLocalTags(updatedLocalTags).withUpdatedFlags(updatedFlags).withUpdatedAttributes(updatedAttributes).withUpdatedMedia(updatedMedia))
+    return storeMessageWithPreservedViewOnceMedia(previousMessage: previousMessage, updatedMessage: storeMessageWithUpdatedEditHistory(previousMessage: previousMessage, updatedMessage: message.withUpdatedLocalTags(updatedLocalTags).withUpdatedFlags(updatedFlags).withUpdatedAttributes(updatedAttributes).withUpdatedMedia(updatedMedia)))
 }

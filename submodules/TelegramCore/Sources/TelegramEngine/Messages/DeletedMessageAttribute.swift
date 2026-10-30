@@ -115,7 +115,7 @@ func interceptMessageDeletion(transaction: Transaction, mediaBox: MediaBox, mess
 func releaseDeletedMessagesMedia(transaction: Transaction, mediaBox: MediaBox, ids: [MessageId]) {
     var resourceIds: [MediaResourceId] = []
     for id in ids {
-        if let message = transaction.getMessage(id), message.deletedAttribute != nil {
+        if let message = transaction.getMessage(id), message.deletedAttribute != nil || message.hasPreservedViewOnceMedia {
             addMessageMediaResourceIdsToRemove(message: message, resourceIds: &resourceIds)
         }
     }

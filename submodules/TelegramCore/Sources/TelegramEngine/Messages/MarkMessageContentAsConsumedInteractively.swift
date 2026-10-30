@@ -114,6 +114,10 @@ func _internal_markMessageContentAsConsumedInteractively(postbox: Postbox, messa
                 }
             }
             
+            if updateMessage && shouldPreserveViewOnceMedia(message: message) && !updatedAttributes.contains(where: { $0 is PreservedViewOnceMediaAttribute }) {
+                updatedAttributes.append(PreservedViewOnceMediaAttribute())
+            }
+
             if updateMessage {
                 transaction.updateMessage(message.id, update: { currentMessage in
                     var storeForwardInfo: StoreMessageForwardInfo?
@@ -198,6 +202,7 @@ func markMessageContentAsConsumedRemotely(transaction: Transaction, messageId: M
         
         let timestamp = Int32(CFAbsoluteTimeGetCurrent() + NSTimeIntervalSince1970)
         let countdownBeginTime = consumeDate ?? timestamp
+        let preserveMedia = shouldPreserveViewOnceMedia(message: message)
         
         for i in 0 ..< updatedAttributes.count {
             if let attribute = updatedAttributes[i] as? AutoremoveTimeoutMessageAttribute {
@@ -206,7 +211,7 @@ func markMessageContentAsConsumedRemotely(transaction: Transaction, messageId: M
                     updateMessage = true
                                  
                     if message.id.peerId.namespace == Namespaces.Peer.SecretChat {
-                    } else {
+                    } else if !preserveMedia {
                         if attribute.timeout == viewOnceTimeout || timestamp >= autoremoveExpiryTimestamp(countdownBeginTime: countdownBeginTime, timeout: attribute.timeout) {
                             for i in 0 ..< updatedMedia.count {
                                 if let _ = updatedMedia[i] as? TelegramMediaImage {
@@ -230,7 +235,7 @@ func markMessageContentAsConsumedRemotely(transaction: Transaction, messageId: M
                     updateMessage = true
                     
                     if message.id.peerId.namespace == Namespaces.Peer.SecretChat {
-                    } else {
+                    } else if !preserveMedia {
                         for i in 0 ..< updatedMedia.count {
                             if attribute.timeout == viewOnceTimeout || timestamp >= autoremoveExpiryTimestamp(countdownBeginTime: countdownBeginTime, timeout: attribute.timeout) {
                                 if let _ = updatedMedia[i] as? TelegramMediaImage {
@@ -251,6 +256,10 @@ func markMessageContentAsConsumedRemotely(transaction: Transaction, messageId: M
             }
         }
         
+        if preserveMedia && updateMessage && !updatedAttributes.contains(where: { $0 is PreservedViewOnceMediaAttribute }) {
+            updatedAttributes.append(PreservedViewOnceMediaAttribute())
+        }
+
         if updateMessage {
             transaction.updateMessage(message.id, update: { currentMessage in
                 var storeForwardInfo: StoreMessageForwardInfo?

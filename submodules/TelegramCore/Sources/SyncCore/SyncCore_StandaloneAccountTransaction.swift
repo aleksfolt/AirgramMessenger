@@ -193,6 +193,9 @@ public let telegramPostboxSeedConfiguration: SeedConfiguration = {
             if let previousEditHistory = previous.first(where: { $0 is MessageEditHistoryAttribute }), !updated.contains(where: { $0 is MessageEditHistoryAttribute }) {
                 updated.append(previousEditHistory)
             }
+            if let previousPreserved = previous.first(where: { $0 is PreservedViewOnceMediaAttribute }), !updated.contains(where: { $0 is PreservedViewOnceMediaAttribute }) {
+                updated.append(previousPreserved)
+            }
         },
         decodeMessageThreadInfo: { entry in
             guard let data = entry.get(MessageHistoryThreadData.self) else {
